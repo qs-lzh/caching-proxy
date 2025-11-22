@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/qs-lzh/caching-proxy/internal/cache"
 	"github.com/qs-lzh/caching-proxy/internal/proxy"
 )
 
@@ -28,6 +29,11 @@ Use --port and --origin to run the proxy server.
 Use --clear-cache to clear stored cached responses.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if clearCache {
+			redisAddr := "localhost:6379"
+			c := cache.NewRedisCache(redisAddr)
+			if err := c.Clear(); err != nil {
+				return fmt.Errorf("failed to clear cache: %w", err)
+			}
 			fmt.Println("Cache cleared.")
 			return nil
 		}
